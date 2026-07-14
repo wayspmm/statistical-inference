@@ -1,56 +1,55 @@
 # statistical-inference
 
-Three end-to-end statistical inference case studies on real data:
-hypothesis testing, Bayesian estimation and confidence intervals —
-each with theory, simulation and a decision on real data.
+Три полноценных проекта по статистическому выводу на реальных данных:
+проверка статистических гипотез, байесовское оценивание и доверительные интервалы. Каждый из них включает теоретическое обоснование, моделирование методом Монте-Карло и
+принятие статистического решения на реальных данных.
 
-## Projects
+## Проекты
 
-### 1. [Anomaly detection via Benford's law](benford-anomaly-detection/benford.ipynb)
-Most-powerful **Neyman–Pearson test** for detecting fabricated numerical data:
-$H_0$ — first digits follow Benford's law vs $H_1$ — uniform digits (fraud model).
+### 1. [Обнаружение аномалий с помощью закона Бенфорда](benford-anomaly-detection/benford.ipynb)
 
-- test statistic built directly from the log-likelihood ratio
-- critical threshold and **power estimated by Monte Carlo** (actual type-I error matches nominal α = 0.05)
-- power curve vs sample size: uniform "fakes" are caught almost surely at n ≈ 100–200
-- applied to real data: world GDP figures (World Bank Open Data) — not rejected
+Проверяются гипотезы:
 
-The same pipeline applies to transaction audit and anti-fraud screening.
+- $H_0$ — первые цифры подчиняются закону Бенфорда;
+- $H_1$ — первые цифры распределены равномерно (модель мошеннических данных).
 
-### 2. [Bayesian shrinkage: the Efron–Morris problem](bayesian-shrinkage/efron_morris.ipynb)
-Classic 1970 baseball dataset: predict each player's true batting ability from
-45 early at-bats.
+Особенности реализации:
 
-- conjugate **Beta-Binomial model**; posterior mean as a shrinkage estimator toward the league average
-- shrinkage cuts total squared prediction error several-fold vs the naive MLE (the James–Stein effect)
-- prior strength κ as an explicit bias–variance dial; SSE(κ) curve
-- equal-tailed **credible intervals**; posterior mean vs median under different losses
+- статистика критерия построена непосредственно на основе отношения логарифмов функций правдоподобия
+- критическое значение и мощность критерия оцениваются методом Монте-Карло (фактическая вероятность ошибки первого рода совпадает с заданным уровнем значимости α = 0.05)
+- исследована зависимость мощности от объема выборки: искусственно сгенерированные равномерные данные обнаруживаются практически со 100%-ной вероятностью уже при $n \approx 100\text{–}200$
+- критерий применен к реальным данным по ВВП стран мира (World Bank Open Data)
+- оснований отвергнуть гипотезу Бенфорда нет
 
-Same mechanics as CTR smoothing for new ads, ratings with few reviews, and mean-target encoding in ML.
+Тот же подход может использоваться для аудита финансовых операций и автоматического обнаружения мошенничества.
 
-### 3. [Confidence intervals: earthquake b-value](confidence-intervals/earthquakes.ipynb)
-Gutenberg–Richter law: magnitudes above the completeness threshold are exponential.
+### 2. [Байесовское сжатие оценок: задача Эфрона—Морриса](bayesian-shrinkage/efron_morris.ipynb)
 
-- MLE for the b-value; **asymptotic vs exact (Gamma-pivot) confidence intervals**
-- a case where asymptotic normality **fails at any n**: the completeness threshold
-  M_c, whose MLE error is exponential — the symmetric interval systematically
-  undercovers and even includes logically impossible values
-- Poisson intensity of the event flow
-- **Monte Carlo coverage check** of every interval as the final referee
+Набор данных бейсбольного сезона 1970 года: прогнозирование истинной результативности каждого игрока по первым 45 выходам на биту.
 
-## Data
+- реализована сопряженная бета-биномиальная модель, в которой апостериорное среднее используется как оценка со сжатием к среднему уровню лиги
+- показано, что такое сжатие уменьшает суммарную квадратичную ошибку прогноза в несколько раз по сравнению с классической оценкой максимального правдоподобия (эффект Джеймса—Стейна)
+- параметр силы априорного распределения κ интерпретируется как явный компромисс между смещением и дисперсией, а также исследуется зависимость SSE(κ)
+- построены равнохвостовые байесовские доверительные (credible) интервалы, а также выполнено сравнение апостериорного среднего и медианы при различных функциях потерь.
 
-Place the CSV files in `data/` (all from open sources):
+Та же методика применяется при сглаживании CTR для новых рекламных объявлений, оценке рейтингов объектов с небольшим числом отзывов и mean-target encoding в задачах машинного обучения.
 
-| file | contents | source |
+### 3. [Доверительные интервалы: параметр b закона Гутенберга—Рихтера](confidence-intervals/earthquakes.ipynb)
+
+Согласно закону Гутенберга—Рихтера, магнитуды землетрясений выше порога полноты каталога имеют экспоненциальное распределение.
+
+- оценка максимального правдоподобия параметра b
+- сравнение асимптотических и точных (Gamma-pivot) доверительных интервалов
+- пример, в котором асимптотическая нормальность не выполняется ни при каком объеме выборки: оценивание порога полноты каталога $M_c$. Ошибка оценки максимального правдоподобия имеет экспоненциальное распределение, поэтому симметричный доверительный интервал систематически имеет недостаточное покрытие и может включать логически невозможные значения
+- оценивание интенсивности пуассоновского потока событий
+- проверка фактического уровня покрытия всех доверительных интервалов методом Монте-Карло
+
+## Используемые датасеты
+
+CSV-файлы необходимо поместить в каталог `data/`. Все наборы данных получены из открытых источников.
+
+| Файл | Содержание | Источник |
 |---|---|---|
-| `benford_data.csv` | world GDP by country-year; city populations | World Bank Open Data |
-| `baseball.csv` | Efron–Morris 1970 dataset, 18 players | classic public dataset |
-| `earthquakes.csv` | earthquake catalog (time, magnitude) | USGS |
-
-## Setup
-
-```bash
-pip install -r requirements.txt
-jupyter notebook
-```
+| `benford_data.csv` | ВВП стран мира по годам; численность населения городов | World Bank Open Data |
+| `baseball.csv` | Набор данных Эфрона—Морриса (1970), 18 игроков | классический открытый набор данных |
+| `earthquakes.csv` | Каталог землетрясений (время, магнитуда) | USGS |
